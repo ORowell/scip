@@ -21,6 +21,8 @@
 
 /*---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0----+----1----+----2*/
 
+#define SCIP_DEBUG
+
 #include <assert.h>
 #include <string.h>
 
@@ -1823,7 +1825,8 @@ TERMINATE:
 static
 SCIP_RETCODE createSubproblems(
    SCIP_BENDERS*         benders,            /**< Benders' decomposition */
-   SCIP_SET*             set                 /**< global SCIP settings */
+   SCIP_SET*             set,                /**< global SCIP settings */
+   SCIP_Bool             useLPsolve
    )
 {
    SCIP* subproblem;
@@ -1947,7 +1950,8 @@ SCIP_RETCODE createSubproblems(
          {
             /* if the user has not implemented a solve subproblem callback, then the subproblem solves are performed
              * internally. To be more efficient the subproblem is put into probing mode. */
-            if( benders->benderssolvesubconvex == NULL && benders->benderssolvesub == NULL
+            if( ( benders->benderssolvesubconvex == NULL && benders->benderssolvesub == NULL
+               || useLPsolve )
                && SCIPgetStage(subproblem) <= SCIP_STAGE_PROBLEM )
             {
                SCIP_CALL( initialiseLPSubproblem(benders, set, i) );
@@ -2063,7 +2067,7 @@ SCIP_RETCODE SCIPbendersInit(
 
    /* creates the subproblems and sets up the probing mode for LP subproblems. This function calls the benderscreatesub
     * callback. */
-   SCIP_CALL( createSubproblems(benders, set) );
+   SCIP_CALL( createSubproblems(benders, set, benders->useLPsolve) );
 
    /* storing the solution tolerance set by the SCIP parameters */
    SCIP_CALL( SCIPsetGetRealParam(set, "benders/solutiontol", &benders->solutiontol) );
