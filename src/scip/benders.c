@@ -69,7 +69,6 @@
 #define SCIP_DEFAULT_EXECFEASPHASE        FALSE  /** should a feasibility phase be executed during the root node processing */
 #define SCIP_DEFAULT_SLACKVARCOEF          1e+6  /** the objective coefficient of the slack variables in the subproblem */
 #define SCIP_DEFAULT_CHECKCONSCONVEXITY    TRUE  /** should the constraints of the subproblem be checked for convexity? */
-#define SCIP_DEFAULT_USELPSOLVE           FALSE  /** TODO: add desc */
 
 #define BENDERS_MAXPSEUDOSOLS                 5  /** the maximum number of pseudo solutions checked before suggesting
                                                   *  merge candidates */
