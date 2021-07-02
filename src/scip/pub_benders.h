@@ -340,6 +340,14 @@ void SCIPbendersSetSubproblemIsConvex(
    int                   probnumber,         /**< the subproblem number */
    SCIP_Bool             isconvex            /**< flag to indicate whether the subproblem is convex */
    );
+   
+SCIP_EXPORT
+void SCIPbendersSetSubproblemUseLPsolve(
+   SCIP_BENDERS*         benders,            /**< Benders' decomposition */
+   int                   probnumber,         /**< the subproblem number */
+   SCIP_Bool             useLPsolve
+   );
+
 
 /** returns whether the subproblem is convex
  *

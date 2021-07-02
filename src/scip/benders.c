@@ -1181,11 +1181,6 @@ SCIP_RETCODE doBendersCreate(
          "should the constraints of the subproblems be checked for convexity?", &(*benders)->checkconsconvexity, FALSE,
          SCIP_DEFAULT_CHECKCONSCONVEXITY, NULL, NULL) ); /*lint !e740*/
 
-   (void) SCIPsnprintf(paramname, SCIP_MAXSTRLEN, "benders/%s/useLPsolve", name);
-   SCIP_CALL( SCIPsetAddBoolParam(set, messagehdlr, blkmem, paramname,
-         "********add desc****************", &(*benders)->useLPsolve, FALSE,
-         SCIP_DEFAULT_USELPSOLVE, NULL, NULL) ); /*lint !e740*/
-
    return SCIP_OKAY;
 }
 
@@ -1832,7 +1827,7 @@ static
 SCIP_RETCODE createSubproblems(
    SCIP_BENDERS*         benders,            /**< Benders' decomposition */
    SCIP_SET*             set,                /**< global SCIP settings */
-   SCIP_Bool             useLPsolve
+   SCIP_Bool*            useLPsolve
    )
 {
    SCIP* subproblem;
@@ -1955,12 +1950,12 @@ SCIP_RETCODE createSubproblems(
           */
          SCIPsetDebugMsg(set, "\nhi\n");
          SCIPsetDebugMsg(set, "Type: %d\n", SCIPbendersGetSubproblemType(benders, i));
-         if( SCIPbendersGetSubproblemType(benders, i) == SCIP_BENDERSSUBTYPE_CONVEXCONT || useLPsolve)
+         if( SCIPbendersGetSubproblemType(benders, i) == SCIP_BENDERSSUBTYPE_CONVEXCONT || useLPsolve[i])
          {
             /* if the user has not implemented a solve subproblem callback, then the subproblem solves are performed
              * internally. To be more efficient the subproblem is put into probing mode. */
             if( ( benders->benderssolvesubconvex == NULL && benders->benderssolvesub == NULL
-               || useLPsolve )
+               || useLPsolve[i] )
                && SCIPgetStage(subproblem) <= SCIP_STAGE_PROBLEM )
             {
                SCIPsetDebugMsg(set, "Running new code!!!!!\n");
@@ -2613,6 +2608,7 @@ SCIP_RETCODE SCIPbendersActivate(
       SCIP_ALLOC( BMSallocMemoryArray(&benders->indepsubprob, benders->nsubproblems) );
       SCIP_ALLOC( BMSallocMemoryArray(&benders->subprobenabled, benders->nsubproblems) );
       SCIP_ALLOC( BMSallocMemoryArray(&benders->mastervarscont, benders->nsubproblems) );
+      SCIP_ALLOC( BMSallocMemoryArray(&benders->useLPsolve, benders->nsubproblems) );
 
       /* creating the priority queue for the subproblem solving status */
       SCIP_CALL( SCIPpqueueCreate(&benders->subprobqueue, benders->nsubproblems, 1.1,
@@ -2634,6 +2630,7 @@ SCIP_RETCODE SCIPbendersActivate(
          benders->indepsubprob[i] = FALSE;
          benders->subprobenabled[i] = TRUE;
          benders->mastervarscont[i] = FALSE;
+         benders->useLPsolve[i] = FALSE;
 
          /* initialising the subproblem solving status */
          SCIP_ALLOC( BMSallocMemory(&solvestat) );
@@ -6383,6 +6380,18 @@ void SCIPbendersSetSubproblemIsConvex(
    benders->subprobisconvex[probnumber] = isconvex;
 
    assert(benders->nconvexsubprobs >= 0 && benders->nconvexsubprobs <= benders->nsubproblems);
+}
+
+void SCIPbendersSetSubproblemUseLPsolve(
+   SCIP_BENDERS*         benders,            /**< Benders' decomposition */
+   int                   probnumber,         /**< the subproblem number */
+   SCIP_Bool             useLPsolve
+   )
+{
+   assert(benders != NULL);
+   assert(probnumber >= 0 && probnumber < SCIPbendersGetNSubproblems(benders));
+
+   benders->useLPsolve[probnumber] = useLPsolve;
 }
 
 /** returns whether the subproblem is convex

@@ -97,7 +97,6 @@ struct SCIP_Benders
                                                   adding slack variables to constraints to ensure feasibility */
    SCIP_Real             slackvarcoef;       /**< the objective coefficient of the slack variables in the subproblem */
    SCIP_Bool             checkconsconvexity; /**< should the constraints of the subproblems be checked for convexity? */
-   SCIP_Bool             useLPsolve;
 
    /* information for heuristics */
    SCIP*                 sourcescip;         /**< the source scip from when the Benders' was copied */
@@ -129,6 +128,7 @@ struct SCIP_Benders
    int                   nactivesubprobs;    /**< the number of active subproblems */
    SCIP_Bool             freesubprobs;       /**< do the subproblems need to be freed by the Benders' decomposition core? */
    SCIP_Bool             masterisnonlinear;  /**< flag to indicate whether the master problem contains non-linear constraints */
+   SCIP_Bool*            useLPsolve;
 
    /* cut strengthening details */
    SCIP_SOL*             corepoint;          /**< the point that is separated for stabilisation */
