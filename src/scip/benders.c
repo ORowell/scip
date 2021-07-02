@@ -69,7 +69,7 @@
 #define SCIP_DEFAULT_EXECFEASPHASE        FALSE  /** should a feasibility phase be executed during the root node processing */
 #define SCIP_DEFAULT_SLACKVARCOEF          1e+6  /** the objective coefficient of the slack variables in the subproblem */
 #define SCIP_DEFAULT_CHECKCONSCONVEXITY    TRUE  /** should the constraints of the subproblem be checked for convexity? */
-#define SCIP_DEFAULT_USELPSOLVE            TRUE  /** TODO: add desc */
+#define SCIP_DEFAULT_USELPSOLVE           FALSE  /** TODO: add desc */
 
 #define BENDERS_MAXPSEUDOSOLS                 5  /** the maximum number of pseudo solutions checked before suggesting
                                                   *  merge candidates */
@@ -1846,6 +1846,7 @@ SCIP_RETCODE createSubproblems(
 
    assert(benders != NULL);
    assert(set != NULL);
+   SCIPsetDebugMsg(set, "Running createSubproblems\n");
 
    /* if the subproblems have already been created, then they will not be created again. This is the case if the
     * transformed problem has been freed and then retransformed. The subproblems should only be created when the problem
@@ -1952,7 +1953,9 @@ SCIP_RETCODE createSubproblems(
          /* after checking the subproblem for convexity, if the subproblem has convex constraints and continuous variables,
           * then the problem is entered into probing mode. Otherwise, it is initialised as a CIP
           */
-         if( SCIPbendersGetSubproblemType(benders, i) == SCIP_BENDERSSUBTYPE_CONVEXCONT )
+         SCIPsetDebugMsg(set, "\nhi\n");
+         SCIPsetDebugMsg(set, "Type: %d\n", SCIPbendersGetSubproblemType(benders, i));
+         if( SCIPbendersGetSubproblemType(benders, i) == SCIP_BENDERSSUBTYPE_CONVEXCONT || useLPsolve)
          {
             /* if the user has not implemented a solve subproblem callback, then the subproblem solves are performed
              * internally. To be more efficient the subproblem is put into probing mode. */
@@ -1960,6 +1963,7 @@ SCIP_RETCODE createSubproblems(
                || useLPsolve )
                && SCIPgetStage(subproblem) <= SCIP_STAGE_PROBLEM )
             {
+               SCIPsetDebugMsg(set, "Running new code!!!!!\n");
                SCIP_CALL( initialiseLPSubproblem(benders, set, i) );
             }
          }
@@ -4177,10 +4181,14 @@ SCIP_RETCODE executeUserDefinedSolvesub(
 
    /* calls the user defined subproblem solving method. Only the convex relaxations are solved during the Large
     * Neighbourhood Benders' Search. */
+   SCIPsetDebugMsg(set, "\nProbNum: %d\n", probnumber);
+   SCIPsetDebugMsg(set, "Type: %d\n", SCIPbendersGetSubproblemType(benders, probnumber));
+   SCIPsetDebugMsg(set, "Solveloop: %d\n", solveloop);
    if( solveloop == SCIP_BENDERSSOLVELOOP_USERCONVEX )
    {
       if( benders->benderssolvesubconvex != NULL )
       {
+         SCIPsetDebugMsg(set, "Calling benderssubsolveconvex\n");
          SCIP_CALL( benders->benderssolvesubconvex(set->scip, benders, sol, probnumber,
                SCIPbendersOnlyCheckConvexRelax(benders, SCIPsetGetSubscipsOff(set)), objective, result) );
       }
@@ -4191,6 +4199,7 @@ SCIP_RETCODE executeUserDefinedSolvesub(
    {
       if( benders->benderssolvesub != NULL )
       {
+         SCIPsetDebugMsg(set, "Calling benderssubsolve\n");
          SCIP_CALL( benders->benderssolvesub(set->scip, benders, sol, probnumber, objective, result) );
       }
       else
