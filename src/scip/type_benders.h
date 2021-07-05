@@ -181,8 +181,9 @@ typedef struct SCIP_SubproblemSolveStat SCIP_SUBPROBLEMSOLVESTAT; /**< the solvi
  *  - scip            : SCIP main data structure
  *  - benders         : the Benders' decomposition data structure
  *  - probnumber      : the subproblem problem number
+ *  - 
  */
-#define SCIP_DECL_BENDERSCREATESUB(x) SCIP_RETCODE x (SCIP* scip, SCIP_BENDERS* benders, int probnumber)
+#define SCIP_DECL_BENDERSCREATESUB(x) SCIP_RETCODE x (SCIP* scip, SCIP_BENDERS* benders, int probnumber, SCIP_Bool* initialise)
 
 /** called before the subproblem solving loop for Benders' decomposition. The pre subproblem solve function gives the
  *  user an oppportunity to perform any global set up for the Benders' decomposition.

@@ -128,7 +128,6 @@ struct SCIP_Benders
    int                   nactivesubprobs;    /**< the number of active subproblems */
    SCIP_Bool             freesubprobs;       /**< do the subproblems need to be freed by the Benders' decomposition core? */
    SCIP_Bool             masterisnonlinear;  /**< flag to indicate whether the master problem contains non-linear constraints */
-   SCIP_Bool*            useLPsolve;
 
    /* cut strengthening details */
    SCIP_SOL*             corepoint;          /**< the point that is separated for stabilisation */

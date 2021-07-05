@@ -341,24 +341,6 @@ void SCIPbendersSetSubproblemIsConvex(
    SCIP_Bool             isconvex            /**< flag to indicate whether the subproblem is convex */
    );
    
-SCIP_EXPORT
-void SCIPbendersSetSubproblemUseLPsolve(
-   SCIP_BENDERS*         benders,            /**< Benders' decomposition */
-   int                   probnumber,         /**< the subproblem number */
-   SCIP_Bool             useLPsolve
-   );
-
-
-/** returns whether the subproblem is convex
- *
- *  This means that the dual solution can be used to generate cuts.
- */
-SCIP_EXPORT
-SCIP_Bool SCIPbendersSubproblemIsConvex(
-   SCIP_BENDERS*         benders,            /**< Benders' decomposition */
-   int                   probnumber          /**< the subproblem number */
-   );
-
 /** returns the number of subproblems that are convex */
 SCIP_EXPORT
 int SCIPbendersGetNConvexSubproblems(
