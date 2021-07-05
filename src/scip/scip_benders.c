@@ -224,6 +224,43 @@ SCIP_RETCODE SCIPsetBendersFree(
    return SCIP_OKAY;
 }
 
+SCIP_RETCODE SCIPinitialiseBendersSubproblem(
+   SCIP*                 scip,               /**< SCIP data structure */
+   SCIP_BENDERS*         benders,            /**< Benders' decomposition */
+   int                   probnumber,         /**< the subproblem number */
+   SCIP_Bool*            success             /**< was the initialisation process successful */
+)
+{
+
+
+   assert(scip != NULL);
+   assert(scip->set != NULL);
+   assert(benders != NULL);
+   assert(probnumber >= 0 && probnumber < SCIPgetBendersNSubproblems(scip, benders));
+
+   SCIPbendersInitialiseSubproblem(benders, scip->set, probnumber, success);
+
+   return SCIP_OKAY;
+}
+
+SCIP_RETCODE SCIPinitialiseBendersLPSubproblem(
+   SCIP*                 scip,               /**< SCIP data structure */
+   SCIP_BENDERS*         benders,            /**< Benders' decomposition */
+   int                   probnumber          /**< the subproblem number */
+)
+{
+
+
+   assert(scip != NULL);
+   assert(scip->set != NULL);
+   assert(benders != NULL);
+   assert(probnumber >= 0 && probnumber < SCIPgetBendersNSubproblems(scip, benders));
+
+   SCIPbendersInitialiseLPSubproblem(benders, scip->set, probnumber);
+   
+   return SCIP_OKAY;
+}
+
 /** sets initialization method of benders
  *
  *  @return \ref SCIP_OKAY is returned if everything worked. Otherwise a suitable error code is passed. See \ref

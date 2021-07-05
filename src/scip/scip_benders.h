@@ -163,6 +163,21 @@ SCIP_RETCODE SCIPsetBendersFree(
    SCIP_DECL_BENDERSFREE((*bendersfree))     /**< destructor of Benders' decomposition */
    );
 
+SCIP_EXPORT
+SCIP_RETCODE SCIPinitialiseBendersSubproblem(
+   SCIP*                 scip,               /**< SCIP data structure */
+   SCIP_BENDERS*         benders,            /**< Benders' decomposition */
+   int                   probnumber,         /**< the subproblem number */
+   SCIP_Bool*            success             /**< was the initialisation process successful */
+   );
+
+SCIP_EXPORT
+SCIP_RETCODE SCIPinitialiseBendersLPSubproblem(
+   SCIP*                 scip,               /**< SCIP data structure */
+   SCIP_BENDERS*         benders,            /**< Benders' decomposition */
+   int                   probnumber          /**< the subproblem number */
+   );
+
 /** sets initialization method of benders
  *
  *  @return \ref SCIP_OKAY is returned if everything worked. Otherwise a suitable error code is passed. See \ref
