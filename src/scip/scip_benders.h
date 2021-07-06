@@ -163,6 +163,14 @@ SCIP_RETCODE SCIPsetBendersFree(
    SCIP_DECL_BENDERSFREE((*bendersfree))     /**< destructor of Benders' decomposition */
    );
 
+/** Initialises a MIP subproblem by putting the problem into SCIP_STAGE_SOLVING.
+ * 
+ *  @return \ref SCIP_OKAY is returned if everything worked. Otherwise a suitable error code is passed. See \ref
+ *          SCIP_Retcode "SCIP_RETCODE" for a complete list of error codes.
+ *
+ *  @pre This method can be called if SCIP is in one of the following stages:
+ *       - \ref SCIP_STAGE_PROBLEM
+ */
 SCIP_EXPORT
 SCIP_RETCODE SCIPinitialiseBendersSubproblem(
    SCIP*                 scip,               /**< SCIP data structure */
@@ -171,6 +179,14 @@ SCIP_RETCODE SCIPinitialiseBendersSubproblem(
    SCIP_Bool*            success             /**< was the initialisation process successful */
    );
 
+/** Initialises an LP subproblem by putting the problem into probing mode.
+ * 
+ *  @return \ref SCIP_OKAY is returned if everything worked. Otherwise a suitable error code is passed. See \ref
+ *          SCIP_Retcode "SCIP_RETCODE" for a complete list of error codes.
+ *
+ *  @pre This method can be called if SCIP is in one of the following stages:
+ *       - \ref SCIP_STAGE_PROBLEM
+ */
 SCIP_EXPORT
 SCIP_RETCODE SCIPinitialiseBendersLPSubproblem(
    SCIP*                 scip,               /**< SCIP data structure */

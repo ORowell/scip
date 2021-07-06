@@ -155,7 +155,7 @@ typedef struct SCIP_SubproblemSolveStat SCIP_SUBPROBLEMSOLVESTAT; /**< the solvi
 /** the method for creating the Benders' decomposition subproblem. This method is called during the initialisation stage
  *  (after the master problem was transformed).
  *
- *  @note When the create subproblem callback is invoked, the mapping between the  master problem and subproblem
+ *  @note When the create subproblem callback is invoked, the mapping between the master problem and subproblem
  *  variables must be available. The create subproblem callback is invoked immediately after BENDERSINIT. So, it is
  *  possible to construct the variable mapping within the BENDERSINIT callback.
  *
@@ -181,7 +181,7 @@ typedef struct SCIP_SubproblemSolveStat SCIP_SUBPROBLEMSOLVESTAT; /**< the solvi
  *  - scip            : SCIP main data structure
  *  - benders         : the Benders' decomposition data structure
  *  - probnumber      : the subproblem problem number
- *  - 
+ *  - initialise      : whether to initialise the problem as an LP
  */
 #define SCIP_DECL_BENDERSCREATESUB(x) SCIP_RETCODE x (SCIP* scip, SCIP_BENDERS* benders, int probnumber, SCIP_Bool* initialise)
 

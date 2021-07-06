@@ -21,8 +21,6 @@
 
 /*---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0----+----1----+----2*/
 
-#define SCIP_DEBUG
-
 #include <assert.h>
 #include <string.h>
 
@@ -1534,6 +1532,15 @@ SCIP_RETCODE SCIPbendersInitialiseLPSubproblem(
 
    subproblem = SCIPbendersSubproblem(benders, probnumber);
    assert(subproblem != NULL);
+
+   /* Check an event handler doesn't already exist */
+   if (SCIPfindEventhdlr(subproblem, NODEFOCUS_EVENTHDLR_NAME) != NULL)
+   {
+      SCIPerrorMessage("Event handler for initialising an LP subproblem already exists.\n");
+      SCIPerrorMessage("To initialise a problem already with an event handler call SCIPinitialiseBendersSubproblem.\n");
+
+      return SCIP_ERROR;
+   }
 
    /* include event handler into SCIP */
    SCIP_CALL( SCIPallocBlockMemory(subproblem, &eventhdlrdata) );
