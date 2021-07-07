@@ -272,6 +272,21 @@ SCIP_DECL_BENDERSSOLVESUB(bendersSolvesubObj)
 }
 
 
+static
+SCIP_DECL_BENDERSPRECUT(bendersPreCutObj)
+{  /*lint --e{715}*/
+   SCIP_BENDERSDATA* bendersdata;
+
+   bendersdata = SCIPbendersGetData(benders);
+   assert(bendersdata != NULL);
+   assert(bendersdata->objbenders != NULL);
+
+   /* call virtual method of benders object */
+   SCIP_CALL( bendersdata->objbenders->scip_precut(scip, benders, sol, result, type, subprobsolved, substatus, nsubproblems, infeasible, optimal) );
+
+   return SCIP_OKAY;
+}
+
 /** method called after the subproblems are solved in the Benders' decomposition algorithm */
 static
 SCIP_DECL_BENDERSPOSTSOLVE(bendersPostsolveObj)
@@ -354,8 +369,8 @@ SCIP_RETCODE SCIPincludeObjBenders(
       objbenders->scip_priority_, objbenders->scip_cutlp_, objbenders->scip_cutpseudo_,
       objbenders->scip_cutrelax_, objbenders->scip_shareauxvars_, bendersCopyObj, bendersFreeObj, bendersInitObj,
       bendersExitObj, bendersInitpreObj, bendersExitpreObj, bendersInitsolObj, bendersExitsolObj, bendersGetvarObj,
-      bendersCreatesubObj, bendersPresubsolveObj, bendersSolvesubconvexObj, bendersSolvesubObj, bendersPostsolveObj,
-      bendersFreesubObj, bendersdata) ); /*lint !e429*/
+      bendersCreatesubObj, bendersPresubsolveObj, bendersSolvesubconvexObj, bendersSolvesubObj, bendersPreCutObj,
+      bendersPostsolveObj, bendersFreesubObj, bendersdata) ); /*lint !e429*/
 
    return SCIP_OKAY; /*lint !e429*/
 }
