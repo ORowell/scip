@@ -216,6 +216,11 @@ public:
       return SCIP_OKAY;
    }
 
+   virtual SCIP_DECL_BENDERSPRECUT(scip_precut)
+   {  /*lint --e{715}*/
+      return SCIP_OKAY;
+   }
+
    /** the post-solve method for Benders' decomposition. The post-solve method is called after the subproblems have
     * been solved but before they are freed.
     *  @see SCIP_DECL_BENDERSPOSTSOLVE(x) in @ref type_benders.h
