@@ -86,6 +86,7 @@ SCIP_RETCODE SCIPincludeBenders(
    SCIP_DECL_BENDERSPRESUBSOLVE((*benderspresubsolve)),/**< the execution method of the Benders' decomposition algorithm */
    SCIP_DECL_BENDERSSOLVESUBCONVEX((*benderssolvesubconvex)),/**< the solving method for convex Benders' decomposition subproblems */
    SCIP_DECL_BENDERSSOLVESUB((*benderssolvesub)),/**< the solving method for the Benders' decomposition subproblems */
+   SCIP_DECL_BENDERSPRECUT((*bendersprecut)),
    SCIP_DECL_BENDERSPOSTSOLVE((*benderspostsolve)),/**< called after the subproblems are solved. */
    SCIP_DECL_BENDERSFREESUB((*bendersfreesub)),/**< the freeing method for the Benders' decomposition subproblems */
    SCIP_BENDERSDATA*     bendersdata         /**< Benders' decomposition data */
@@ -115,7 +116,7 @@ SCIP_RETCODE SCIPincludeBenders(
    SCIP_CALL( SCIPbendersCreate(&benders, scip->set, scip->messagehdlr, scip->mem->setmem, name, desc, priority,
          cutlp, cutpseudo, cutrelax, shareauxvars, benderscopy, bendersfree, bendersinit, bendersexit, bendersinitpre,
          bendersexitpre, bendersinitsol, bendersexitsol, bendersgetvar, benderscreatesub, benderspresubsolve,
-         benderssolvesubconvex, benderssolvesub, benderspostsolve, bendersfreesub, bendersdata) );
+         benderssolvesubconvex, benderssolvesub, bendersprecut, benderspostsolve, bendersfreesub, bendersdata) );
    SCIP_CALL( SCIPsetIncludeBenders(scip->set, benders) );
 
    return SCIP_OKAY;
@@ -167,7 +168,7 @@ SCIP_RETCODE SCIPincludeBendersBasic(
 
    SCIP_CALL( SCIPbendersCreate(&benders, scip->set, scip->messagehdlr, scip->mem->setmem, name, desc, priority,
          cutlp, cutpseudo, cutrelax, shareauxvars, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, bendersgetvar,
-         benderscreatesub, NULL, NULL, NULL, NULL, NULL, bendersdata) );
+         benderscreatesub, NULL, NULL, NULL, NULL, NULL, NULL, bendersdata) );
    SCIP_CALL( SCIPsetIncludeBenders(scip->set, benders) );
 
    if( bendersptr != NULL )

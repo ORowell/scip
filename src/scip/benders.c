@@ -1012,6 +1012,7 @@ SCIP_RETCODE doBendersCreate(
    SCIP_DECL_BENDERSPRESUBSOLVE((*benderspresubsolve)),/**< called prior to the subproblem solving loop */
    SCIP_DECL_BENDERSSOLVESUBCONVEX((*benderssolvesubconvex)),/**< the solving method for convex Benders' decomposition subproblems */
    SCIP_DECL_BENDERSSOLVESUB((*benderssolvesub)),/**< the solving method for the Benders' decomposition subproblems */
+   SCIP_DECL_BENDERSPRECUT((*bendersprecut)),
    SCIP_DECL_BENDERSPOSTSOLVE((*benderspostsolve)),/**< called after the subproblems are solved. */
    SCIP_DECL_BENDERSFREESUB((*bendersfreesub)),/**< the freeing method for the Benders' decomposition subproblems */
    SCIP_BENDERSDATA*     bendersdata         /**< Benders' decomposition data */
@@ -1055,6 +1056,7 @@ SCIP_RETCODE doBendersCreate(
    (*benders)->benderspresubsolve = benderspresubsolve;
    (*benders)->benderssolvesubconvex = benderssolvesubconvex;
    (*benders)->benderssolvesub = benderssolvesub;
+   (*benders)->bendersprecut = bendersprecut;
    (*benders)->benderspostsolve = benderspostsolve;
    (*benders)->bendersfreesub = bendersfreesub;
    (*benders)->bendersdata = bendersdata;
@@ -1210,6 +1212,7 @@ SCIP_RETCODE SCIPbendersCreate(
    SCIP_DECL_BENDERSPRESUBSOLVE((*benderspresubsolve)),/**< called prior to the subproblem solving loop */
    SCIP_DECL_BENDERSSOLVESUBCONVEX((*benderssolvesubconvex)),/**< the solving method for convex Benders' decomposition subproblems */
    SCIP_DECL_BENDERSSOLVESUB((*benderssolvesub)),/**< the solving method for the Benders' decomposition subproblems */
+   SCIP_DECL_BENDERSPRECUT((*bendersprecut)),
    SCIP_DECL_BENDERSPOSTSOLVE((*benderspostsolve)),/**< called after the subproblems are solved. */
    SCIP_DECL_BENDERSFREESUB((*bendersfreesub)),/**< the freeing method for the Benders' decomposition subproblems */
    SCIP_BENDERSDATA*     bendersdata         /**< Benders' decomposition data */
@@ -1222,7 +1225,8 @@ SCIP_RETCODE SCIPbendersCreate(
    SCIP_CALL_FINALLY( doBendersCreate(benders, set, messagehdlr, blkmem, name, desc, priority, cutlp, cutpseudo,
          cutrelax, shareauxvars, benderscopy, bendersfree, bendersinit, bendersexit, bendersinitpre, bendersexitpre,
          bendersinitsol, bendersexitsol, bendersgetvar, benderscreatesub, benderspresubsolve, benderssolvesubconvex,
-         benderssolvesub, benderspostsolve, bendersfreesub, bendersdata), (void) SCIPbendersFree(benders, set) );
+         benderssolvesub, bendersprecut, benderspostsolve, bendersfreesub, bendersdata),
+         (void) SCIPbendersFree(benders, set) );
 
    return SCIP_OKAY;
 }
@@ -3847,6 +3851,10 @@ SCIP_RETCODE SCIPbendersExec(
          /* if the solving has been stopped, then the subproblem solving and cut generation must terminate */
          if( stopped )
             break;
+
+         if (benders->bendersprecut != NULL)
+            benders->bendersprecut(set->scip, benders, sol, *result, type, subprobsolved,
+            substatus, nsubproblems, *infeasible, optimal);
 
          /* Generating cuts for the subproblems. Cuts are only generated when the solution is from primal heuristics,
           * relaxations or the LP
