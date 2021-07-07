@@ -283,6 +283,10 @@ typedef struct SCIP_SubproblemSolveStat SCIP_SUBPROBLEMSOLVESTAT; /**< the solvi
 #define SCIP_DECL_BENDERSSOLVESUB(x) SCIP_RETCODE x (SCIP* scip, SCIP_BENDERS* benders, SCIP_SOL* sol, int probnumber,\
   SCIP_Real* objective, SCIP_RESULT* result)
 
+#define SCIP_DECL_BENDERSPRECUT(x) SCIP_RETCODE x (SCIP* scip, SCIP_BENDERS* benders, SCIP_SOL* sol, SCIP_RESULT result,\
+  SCIP_BENDERSENFOTYPE type, SCIP_Bool* subprobsolved, SCIP_BENDERSSUBSTATUS* substatus,\
+  int nsubproblems, SCIP_Bool infeasible, SCIP_Bool optimal)
+
 /** the post-solve method for Benders' decomposition. The post-solve method is called after the subproblems have
  * been solved but before they have been freed. After the solving of the Benders' decomposition subproblems, the
  * subproblem solving data is freed in the SCIP_DECL_BENDERSFREESUB callback. However, it is not necessary to implement

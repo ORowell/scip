@@ -62,6 +62,7 @@ struct SCIP_Benders
    SCIP_DECL_BENDERSCREATESUB((*benderscreatesub));/**< creates the Benders' decomposition subproblems */
    SCIP_DECL_BENDERSSOLVESUBCONVEX((*benderssolvesubconvex));/**< the solving method for convex Benders' decomposition subproblems */
    SCIP_DECL_BENDERSSOLVESUB((*benderssolvesub));/**< the solving method for the Benders' decomposition subproblems */
+   SCIP_DECL_BENDERSPRECUT((*bendersprecut));
    SCIP_DECL_BENDERSPOSTSOLVE((*benderspostsolve));/**< called after the subproblems are solved. */
    SCIP_DECL_BENDERSFREESUB((*bendersfreesub));/**< the freeing method for the Benders' decomposition subproblems */
    SCIP_DECL_SORTPTRCOMP((*benderssubcomp)); /**< a comparator for defining the solving order of the subproblems */
