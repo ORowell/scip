@@ -88,6 +88,7 @@ SCIP_RETCODE SCIPincludeBenders(
    SCIP_DECL_BENDERSSOLVESUB((*benderssolvesub)),/**< the solving method for the Benders' decomposition subproblems */
    SCIP_DECL_BENDERSPRECUT((*bendersprecut)),
    SCIP_DECL_BENDERSPOSTSOLVE((*benderspostsolve)),/**< called after the subproblems are solved. */
+   SCIP_DECL_BENDERSENFORCESOL((*bendersenforcesol)),
    SCIP_DECL_BENDERSFREESUB((*bendersfreesub)),/**< the freeing method for the Benders' decomposition subproblems */
    SCIP_BENDERSDATA*     bendersdata         /**< Benders' decomposition data */
    )
@@ -116,7 +117,8 @@ SCIP_RETCODE SCIPincludeBenders(
    SCIP_CALL( SCIPbendersCreate(&benders, scip->set, scip->messagehdlr, scip->mem->setmem, name, desc, priority,
          cutlp, cutpseudo, cutrelax, shareauxvars, benderscopy, bendersfree, bendersinit, bendersexit, bendersinitpre,
          bendersexitpre, bendersinitsol, bendersexitsol, bendersgetvar, benderscreatesub, benderspresubsolve,
-         benderssolvesubconvex, benderssolvesub, bendersprecut, benderspostsolve, bendersfreesub, bendersdata) );
+         benderssolvesubconvex, benderssolvesub, bendersprecut, benderspostsolve, bendersenforcesol, bendersfreesub,
+         bendersdata) );
    SCIP_CALL( SCIPsetIncludeBenders(scip->set, benders) );
 
    return SCIP_OKAY;
@@ -168,7 +170,7 @@ SCIP_RETCODE SCIPincludeBendersBasic(
 
    SCIP_CALL( SCIPbendersCreate(&benders, scip->set, scip->messagehdlr, scip->mem->setmem, name, desc, priority,
          cutlp, cutpseudo, cutrelax, shareauxvars, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, bendersgetvar,
-         benderscreatesub, NULL, NULL, NULL, NULL, NULL, NULL, bendersdata) );
+         benderscreatesub, NULL, NULL, NULL, NULL, NULL, NULL, NULL, bendersdata) );
    SCIP_CALL( SCIPsetIncludeBenders(scip->set, benders) );
 
    if( bendersptr != NULL )
@@ -492,6 +494,30 @@ SCIP_RETCODE SCIPsetBendersSolveAndFreesub(
    return SCIP_OKAY;
 }
 
+/** sets the pre cut callback of Benders' decomposition 
+ *
+ *  @return \ref SCIP_OKAY is returned if everything worked. Otherwise a suitable error code is passed. See \ref
+ *          SCIP_Retcode "SCIP_RETCODE" for a complete list of error codes.
+ *
+ *  @pre This method can be called if SCIP is in one of the following stages:
+ *       - \ref SCIP_STAGE_INIT
+ *       - \ref SCIP_STAGE_PROBLEM
+ */
+SCIP_RETCODE SCIPsetBendersPrecut(
+   SCIP*                 scip,               /**< SCIP data structure */
+   SCIP_BENDERS*         benders,            /**< Benders' decomposition */
+   SCIP_DECL_BENDERSPRECUT((*bendersprecut)) /**< called prior to cuts being added */
+   )
+{
+   SCIP_CALL( SCIPcheckStage(scip, "SCIPsetBendersPrecut", TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE) );
+
+   assert(benders != NULL);
+
+   SCIPbendersSetPrecut(benders, bendersprecut);
+
+   return SCIP_OKAY;
+}
+
 /** sets the post solving methods for benders
  *
  *  @return \ref SCIP_OKAY is returned if everything worked. Otherwise a suitable error code is passed. See \ref
@@ -536,6 +562,30 @@ SCIP_RETCODE SCIPsetBendersSubproblemComp(
    assert(benders != NULL);
 
    SCIPbendersSetSubproblemComp(benders, benderssubcomp);
+
+   return SCIP_OKAY;
+}
+
+/** sets the callback called before enforcing the constraints on a Benders' subproblem
+ *
+ *  @return \ref SCIP_OKAY is returned if everything worked. Otherwise a suitable error code is passed. See \ref
+ *          SCIP_Retcode "SCIP_RETCODE" for a complete list of error codes.
+ *
+ *  @pre This method can be called if SCIP is in one of the following stages:
+ *       - \ref SCIP_STAGE_INIT
+ *       - \ref SCIP_STAGE_PROBLEM
+ */
+SCIP_RETCODE SCIPsetBendersEnforcesol(
+   SCIP*                 scip,               /**< SCIP data structure */
+   SCIP_BENDERS*         benders,            /**< Benders' decomposition */
+   SCIP_DECL_BENDERSENFORCESOL((*bendersenforcesol))
+   )
+{
+   SCIP_CALL( SCIPcheckStage(scip, "SCIPsetBendersEnforcesol", TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE) );
+
+   assert(benders != NULL);
+
+   SCIPbendersSetEnforcesol(benders, bendersenforcesol);
 
    return SCIP_OKAY;
 }

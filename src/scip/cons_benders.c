@@ -43,6 +43,7 @@
 #include "scip/cons_benders.h"
 #include "scip/heur_trysol.h"
 #include "scip/heuristics.h"
+#include "scip/struct_benders.h"
 
 
 /* fundamental constraint handler properties */
@@ -276,6 +277,14 @@ SCIP_RETCODE SCIPconsBendersEnforceSolution(
 
    for( i = 0; i < nactivebenders; i++ )
    {
+      SCIP_Bool skipenforce = FALSE;
+      SCIP_CALL( benders[i]->bendersenforcesol(scip, benders[i], sol, type, checkint, &skipenforce) );
+
+      if (skipenforce)
+      {
+         continue;
+      }
+
       switch( type )
       {
          case SCIP_BENDERSENFOTYPE_LP:
