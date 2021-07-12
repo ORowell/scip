@@ -1014,7 +1014,7 @@ SCIP_RETCODE doBendersCreate(
    SCIP_DECL_BENDERSSOLVESUB((*benderssolvesub)),/**< the solving method for the Benders' decomposition subproblems */
    SCIP_DECL_BENDERSPRECUT((*bendersprecut)),/**< called prior to cuts being added */
    SCIP_DECL_BENDERSPOSTSOLVE((*benderspostsolve)),/**< called after the subproblems are solved. */
-   SCIP_DECL_BENDERSENFORCESOL((*bendersenforcesol)),/** called before enforcing the constraints on a Benders' subproblem */
+   SCIP_DECL_BENDERSENFORCESOL((*bendersenforcesol)),/**< called before enforcing the constraints on a Benders' subproblem */
    SCIP_DECL_BENDERSFREESUB((*bendersfreesub)),/**< the freeing method for the Benders' decomposition subproblems */
    SCIP_BENDERSDATA*     bendersdata         /**< Benders' decomposition data */
    )
@@ -1214,9 +1214,9 @@ SCIP_RETCODE SCIPbendersCreate(
    SCIP_DECL_BENDERSPRESUBSOLVE((*benderspresubsolve)),/**< called prior to the subproblem solving loop */
    SCIP_DECL_BENDERSSOLVESUBCONVEX((*benderssolvesubconvex)),/**< the solving method for convex Benders' decomposition subproblems */
    SCIP_DECL_BENDERSSOLVESUB((*benderssolvesub)),/**< the solving method for the Benders' decomposition subproblems */
-   SCIP_DECL_BENDERSPRECUT((*bendersprecut)),
+   SCIP_DECL_BENDERSPRECUT((*bendersprecut)),/**< called prior to cuts being added */
    SCIP_DECL_BENDERSPOSTSOLVE((*benderspostsolve)),/**< called after the subproblems are solved. */
-   SCIP_DECL_BENDERSENFORCESOL((*bendersenforcesol)),
+   SCIP_DECL_BENDERSENFORCESOL((*bendersenforcesol)),/**< called before enforcing the constraints on a Benders' subproblem */
    SCIP_DECL_BENDERSFREESUB((*bendersfreesub)),/**< the freeing method for the Benders' decomposition subproblems */
    SCIP_BENDERSDATA*     bendersdata         /**< Benders' decomposition data */
    )
@@ -5943,7 +5943,7 @@ void SCIPbendersSetPostsolve(
 /** called before enforcing the constraints on a Benders' subproblem */
 void SCIPbendersSetEnforcesol(
    SCIP_BENDERS*         benders,            /**< Benders' decomposition */
-   SCIP_DECL_BENDERSENFORCESOL((*bendersenforcesol))
+   SCIP_DECL_BENDERSENFORCESOL((*bendersenforcesol))/**< called before enforcing the constraints */
    )
 {
    assert(benders != NULL);
