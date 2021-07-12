@@ -271,7 +271,7 @@ SCIP_DECL_BENDERSSOLVESUB(bendersSolvesubObj)
    return SCIP_OKAY;
 }
 
-
+/** method called prior to cuts being added */
 static
 SCIP_DECL_BENDERSPRECUT(bendersPreCutObj)
 {  /*lint --e{715}*/
@@ -282,10 +282,11 @@ SCIP_DECL_BENDERSPRECUT(bendersPreCutObj)
    assert(bendersdata->objbenders != NULL);
 
    /* call virtual method of benders object */
-   SCIP_CALL( bendersdata->objbenders->scip_precut(scip, benders, sol, result, type, subprobsolved, substatus, nsubproblems, infeasible, optimal) );
+   SCIP_CALL( bendersdata->objbenders->scip_precut(scip, benders, sol, type, subprobsolved, substatus, nsubproblems, infeasible, optimal) );
 
    return SCIP_OKAY;
 }
+
 
 /** method called after the subproblems are solved in the Benders' decomposition algorithm */
 static
@@ -300,6 +301,22 @@ SCIP_DECL_BENDERSPOSTSOLVE(bendersPostsolveObj)
    /* call virtual method of benders object */
    SCIP_CALL( bendersdata->objbenders->scip_postsolve(scip, benders, sol, type, mergecands, npriomergecands,
       nmergecands, checkint, infeasible, merged) );
+
+   return SCIP_OKAY;
+}
+
+/** method called before enforcing the constraints on a Benders' subproblem */
+static
+SCIP_DECL_BENDERSENFORCESOL(bendersEnforceSolObj)
+{  /*lint --e{715}*/
+   SCIP_BENDERSDATA* bendersdata;
+
+   bendersdata = SCIPbendersGetData(benders);
+   assert(bendersdata != NULL);
+   assert(bendersdata->objbenders != NULL);
+
+   /* call virtual method of benders object */
+   SCIP_CALL( bendersdata->objbenders->scip_enforcesol(scip, benders, sol, type, checkint, skipenforce) );
 
    return SCIP_OKAY;
 }
@@ -370,7 +387,7 @@ SCIP_RETCODE SCIPincludeObjBenders(
       objbenders->scip_cutrelax_, objbenders->scip_shareauxvars_, bendersCopyObj, bendersFreeObj, bendersInitObj,
       bendersExitObj, bendersInitpreObj, bendersExitpreObj, bendersInitsolObj, bendersExitsolObj, bendersGetvarObj,
       bendersCreatesubObj, bendersPresubsolveObj, bendersSolvesubconvexObj, bendersSolvesubObj, bendersPreCutObj,
-      bendersPostsolveObj, bendersFreesubObj, bendersdata) ); /*lint !e429*/
+      bendersPostsolveObj, bendersEnforceSolObj, bendersFreesubObj, bendersdata) ); /*lint !e429*/
 
    return SCIP_OKAY; /*lint !e429*/
 }

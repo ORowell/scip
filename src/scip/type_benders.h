@@ -283,9 +283,23 @@ typedef struct SCIP_SubproblemSolveStat SCIP_SUBPROBLEMSOLVESTAT; /**< the solvi
 #define SCIP_DECL_BENDERSSOLVESUB(x) SCIP_RETCODE x (SCIP* scip, SCIP_BENDERS* benders, SCIP_SOL* sol, int probnumber,\
   SCIP_Real* objective, SCIP_RESULT* result)
 
-#define SCIP_DECL_BENDERSPRECUT(x) SCIP_RETCODE x (SCIP* scip, SCIP_BENDERS* benders, SCIP_SOL* sol, SCIP_RESULT result,\
-  SCIP_BENDERSENFOTYPE type, SCIP_Bool* subprobsolved, SCIP_BENDERSSUBSTATUS* substatus,\
-  int nsubproblems, SCIP_Bool infeasible, SCIP_Bool optimal)
+/** called during the solving loop for Benders' decomposition after a subproblem has been solved and before the solution
+ *  is used to generate cuts
+ * 
+ *  input:
+ *  - scip            : SCIP main data structure
+ *  - benders         : the Benders' decomposition data structure
+ *  - sol             : the solution that will being checked by the subproblems. Can be NULL
+ *  - type            : the type of solution being enforced
+ *  - subprobsolved   : array indicating which subproblems have been solved
+ *  - substatus       : array indicating the status of each of the subproblems
+ *  - nsubproblems    : number of subproblems
+ *  - infeasible      : is the master problem infeasible with respect to the Benders' cuts?
+ *  - optimal         : is the current solution optimal?
+ */
+#define SCIP_DECL_BENDERSPRECUT(x) SCIP_RETCODE x (SCIP* scip, SCIP_BENDERS* benders, SCIP_SOL* sol,\
+  SCIP_BENDERSENFOTYPE type, SCIP_Bool* subprobsolved, SCIP_BENDERSSUBSTATUS* substatus, int nsubproblems,\
+  SCIP_Bool infeasible, SCIP_Bool optimal)
 
 /** the post-solve method for Benders' decomposition. The post-solve method is called after the subproblems have
  * been solved but before they have been freed. After the solving of the Benders' decomposition subproblems, the
@@ -323,6 +337,22 @@ typedef struct SCIP_SubproblemSolveStat SCIP_SUBPROBLEMSOLVESTAT; /**< the solvi
 #define SCIP_DECL_BENDERSPOSTSOLVE(x) SCIP_RETCODE x (SCIP* scip, SCIP_BENDERS* benders, SCIP_SOL* sol,\
    SCIP_BENDERSENFOTYPE type, int* mergecands, int npriomergecands, int nmergecands, SCIP_Bool checkint,\
    SCIP_Bool infeasible, SCIP_Bool* merged)
+
+/** called before enforcing the constraints on a Benders' subproblem for a given solution. This allows the user
+ *  to access the data before solutions are enforced and choose whether to continue with or skip enforcement for that
+ *  subproblem
+ * 
+ *  input:
+ *  - scip            : SCIP main data structure
+ *  - benders         : the Benders' decomposition data structure
+ *  - sol             : the primal solution to enforce, or NULL for the current LP/pseudo sol
+ *  - conshdlr        : the constraint handler
+ *  - type            : the type of solution being enforced
+ *  - checkint        : is the integrality being considered when checking the subproblems
+ *  - skipenforce     : Flag to indicate wether enforcement should be doen for this subproblem or skipped
+ */
+#define SCIP_DECL_BENDERSENFORCESOL(x) SCIP_RETCODE x (SCIP* scip, SCIP_BENDERS* benders, SCIP_SOL* sol,\
+   SCIP_BENDERSENFOTYPE type, SCIP_Bool checkint, SCIP_Bool* skipenforce)
 
 /** frees the subproblem so that it can be resolved in the next iteration. As stated above, it is not necessary to
  *  implement this callback. If the callback is implemented, the subproblems should be freed by calling
