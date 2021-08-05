@@ -172,6 +172,9 @@ SCIP_RETCODE SCIPsetBendersFree(
  *
  *  @pre This method can be called if SCIP is in one of the following stages:
  *       - \ref SCIP_STAGE_PROBLEM
+ *       - \ref SCIP_STAGE_TRANSFORMED
+ *       - \ref SCIP_STAGE_SOLVING
+ *       - \ref SCIP_STAGE_SOLVED
  */
 SCIP_EXPORT
 SCIP_RETCODE SCIPinitialiseBendersSubproblem(
@@ -188,6 +191,9 @@ SCIP_RETCODE SCIPinitialiseBendersSubproblem(
  *
  *  @pre This method can be called if SCIP is in one of the following stages:
  *       - \ref SCIP_STAGE_PROBLEM
+ *       - \ref SCIP_STAGE_TRANSFORMED
+ *       - \ref SCIP_STAGE_SOLVING
+ *       - \ref SCIP_STAGE_SOLVED
  */
 SCIP_EXPORT
 SCIP_RETCODE SCIPinitialiseBendersLPSubproblem(
