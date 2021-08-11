@@ -1476,8 +1476,7 @@ SCIP_RETCODE addSlackVarsToConstraints(
  *  The MIP solving function is called to initialise the subproblem because this function calls SCIPsolve with the
  *  appropriate parameter settings for Benders' decomposition.
  */
-static
-SCIP_RETCODE initialiseSubproblem(
+SCIP_RETCODE SCIPbendersInitialiseSubproblem(
    SCIP_BENDERS*         benders,            /**< Benders' decomposition */
    SCIP_SET*             set,                /**< global SCIP settings */
    int                   probnumber,         /**< the subproblem number */
@@ -1517,8 +1516,7 @@ SCIP_RETCODE initialiseSubproblem(
 /** initialises an LP subproblem by putting the problem into probing mode. The probing mode is invoked in a node focus
  *  event handler. This event handler is added just prior to calling the initialise subproblem function.
  */
-static
-SCIP_RETCODE initialiseLPSubproblem(
+SCIP_RETCODE SCIPbendersInitialiseLPSubproblem(
    SCIP_BENDERS*         benders,            /**< Benders' decomposition */
    SCIP_SET*             set,                /**< global SCIP settings */
    int                   probnumber          /**< the subproblem number */
@@ -1535,6 +1533,15 @@ SCIP_RETCODE initialiseLPSubproblem(
    subproblem = SCIPbendersSubproblem(benders, probnumber);
    assert(subproblem != NULL);
 
+   /* Check an event handler doesn't already exist */
+   if (SCIPfindEventhdlr(subproblem, NODEFOCUS_EVENTHDLR_NAME) != NULL)
+   {
+      SCIPerrorMessage("Event handler for initialising an LP subproblem already exists.\n");
+      SCIPerrorMessage("To initialise a problem already with an event handler call SCIPinitialiseBendersSubproblem.\n");
+
+      return SCIP_ERROR;
+   }
+
    /* include event handler into SCIP */
    SCIP_CALL( SCIPallocBlockMemory(subproblem, &eventhdlrdata) );
 
@@ -1549,7 +1556,7 @@ SCIP_RETCODE initialiseLPSubproblem(
    assert(eventhdlr != NULL);
 
    /* calling an initial solve to put the problem into probing mode */
-   SCIP_CALL( initialiseSubproblem(benders, set, probnumber, &success) );
+   SCIP_CALL( SCIPinitialiseBendersSubproblem(set->scip, benders, probnumber, &success) );
 
    return SCIP_OKAY; /*lint !e438*/
 }
@@ -1849,8 +1856,9 @@ SCIP_RETCODE createSubproblems(
    /* creating all subproblems */
    for( i = 0; i < nsubproblems; i++ )
    {
+      SCIP_Bool initialise = FALSE;
       /* calling the create subproblem call back method */
-      SCIP_CALL( benders->benderscreatesub(set->scip, benders, i) );
+      SCIP_CALL( benders->benderscreatesub(set->scip, benders, i, &initialise) );
 
       subproblem = SCIPbendersSubproblem(benders, i);
 
@@ -1943,14 +1951,15 @@ SCIP_RETCODE createSubproblems(
          /* after checking the subproblem for convexity, if the subproblem has convex constraints and continuous variables,
           * then the problem is entered into probing mode. Otherwise, it is initialised as a CIP
           */
-         if( SCIPbendersGetSubproblemType(benders, i) == SCIP_BENDERSSUBTYPE_CONVEXCONT )
+         if( SCIPbendersGetSubproblemType(benders, i) == SCIP_BENDERSSUBTYPE_CONVEXCONT || initialise)
          {
             /* if the user has not implemented a solve subproblem callback, then the subproblem solves are performed
              * internally. To be more efficient the subproblem is put into probing mode. */
-            if( benders->benderssolvesubconvex == NULL && benders->benderssolvesub == NULL
+            if( ( benders->benderssolvesubconvex == NULL && benders->benderssolvesub == NULL
+               || initialise )
                && SCIPgetStage(subproblem) <= SCIP_STAGE_PROBLEM )
             {
-               SCIP_CALL( initialiseLPSubproblem(benders, set, i) );
+               SCIP_CALL( SCIPinitialiseBendersLPSubproblem(set->scip, benders, i) );
             }
          }
          else
@@ -4433,7 +4442,7 @@ SCIP_RETCODE SCIPbendersSetupSubproblem(
    {
       SCIP_Bool success;
 
-      SCIP_CALL( initialiseSubproblem(benders, set, probnumber, &success) );
+      SCIP_CALL( SCIPinitialiseBendersSubproblem(set->scip, benders, probnumber, &success) );
 
       if( !success )
       {
@@ -4609,7 +4618,7 @@ SCIP_RETCODE SCIPbendersSolveSubproblem(
          }
          else
          {
-            SCIP_CALL( initialiseSubproblem(benders, set, probnumber, &success) );
+            SCIP_CALL( SCIPinitialiseBendersSubproblem(set->scip, benders, probnumber, &success) );
          }
 
          /* if setting up the subproblem was successful */
@@ -6534,7 +6543,7 @@ SCIP_RETCODE SCIPbendersChgMastervarsToCont(
           */
          if( SCIPbendersGetSubproblemType(benders, probnumber) == SCIP_BENDERSSUBTYPE_CONVEXCONT )
          {
-            SCIP_CALL( initialiseLPSubproblem(benders, set, probnumber) );
+            SCIP_CALL( SCIPinitialiseBendersLPSubproblem(set->scip, benders, probnumber) );
          }
       }
 

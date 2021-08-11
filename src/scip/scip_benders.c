@@ -224,6 +224,65 @@ SCIP_RETCODE SCIPsetBendersFree(
    return SCIP_OKAY;
 }
 
+/** Initialises a MIP subproblem by putting the problem into SCIP_STAGE_SOLVING.
+ * 
+ *  @return \ref SCIP_OKAY is returned if everything worked. Otherwise a suitable error code is passed. See \ref
+ *          SCIP_Retcode "SCIP_RETCODE" for a complete list of error codes.
+ *
+ *  @pre This method can be called if SCIP is in one of the following stages:
+ *       - \ref SCIP_STAGE_PROBLEM
+ *       - \ref SCIP_STAGE_TRANSFORMED
+ *       - \ref SCIP_STAGE_SOLVING
+ *       - \ref SCIP_STAGE_SOLVED
+ */
+SCIP_RETCODE SCIPinitialiseBendersSubproblem(
+   SCIP*                 scip,               /**< SCIP data structure */
+   SCIP_BENDERS*         benders,            /**< Benders' decomposition */
+   int                   probnumber,         /**< the subproblem number */
+   SCIP_Bool*            success             /**< was the initialisation process successful */
+)
+{
+   SCIP_CALL( SCIPcheckStage(scip, "SCIPinitialiseBendersSubproblem", FALSE, TRUE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE) );
+
+   assert(scip != NULL);
+   assert(scip->set != NULL);
+   assert(benders != NULL);
+   assert(probnumber >= 0 && probnumber < SCIPgetBendersNSubproblems(scip, benders));
+
+   SCIPbendersInitialiseSubproblem(benders, scip->set, probnumber, success);
+
+   return SCIP_OKAY;
+}
+
+/** Initialises an LP subproblem by putting the problem into probing mode.
+ * 
+ *  @return \ref SCIP_OKAY is returned if everything worked. Otherwise a suitable error code is passed. See \ref
+ *          SCIP_Retcode "SCIP_RETCODE" for a complete list of error codes.
+ *
+ *  @pre This method can be called if SCIP is in one of the following stages:
+ *       - \ref SCIP_STAGE_PROBLEM
+ *       - \ref SCIP_STAGE_TRANSFORMED
+ *       - \ref SCIP_STAGE_SOLVING
+ *       - \ref SCIP_STAGE_SOLVED
+ */
+SCIP_RETCODE SCIPinitialiseBendersLPSubproblem(
+   SCIP*                 scip,               /**< SCIP data structure */
+   SCIP_BENDERS*         benders,            /**< Benders' decomposition */
+   int                   probnumber          /**< the subproblem number */
+)
+{
+   SCIP_CALL( SCIPcheckStage(scip, "SCIPinitialiseBendersLPSubproblem", FALSE, TRUE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE) );
+
+   assert(scip != NULL);
+   assert(scip->set != NULL);
+   assert(benders != NULL);
+   assert(probnumber >= 0 && probnumber < SCIPgetBendersNSubproblems(scip, benders));
+
+   SCIPbendersInitialiseLPSubproblem(benders, scip->set, probnumber);
+   
+   return SCIP_OKAY;
+}
+
 /** sets initialization method of benders
  *
  *  @return \ref SCIP_OKAY is returned if everything worked. Otherwise a suitable error code is passed. See \ref

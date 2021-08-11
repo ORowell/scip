@@ -213,7 +213,7 @@ SCIP_DECL_BENDERSCREATESUB(bendersCreatesubObj)
    assert(bendersdata->objbenders != NULL);
 
    /* call virtual method of benders object */
-   SCIP_CALL( bendersdata->objbenders->scip_createsub(scip, benders, probnumber) );
+   SCIP_CALL( bendersdata->objbenders->scip_createsub(scip, benders, probnumber, initialise) );
 
    return SCIP_OKAY;
 }
