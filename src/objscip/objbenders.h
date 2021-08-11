@@ -216,11 +216,30 @@ public:
       return SCIP_OKAY;
    }
 
+   /** called after each subproblem is solved but before the result is used to generate cuts.
+    *
+    *   @see SCIP_DECL_BENDERSPRECUT(x) in @ref type_benders.h
+    */
+   virtual SCIP_DECL_BENDERSPRECUT(scip_precut)
+   {  /*lint --e{715}*/
+      return SCIP_OKAY;
+   }
+
    /** the post-solve method for Benders' decomposition. The post-solve method is called after the subproblems have
     * been solved but before they are freed.
     *  @see SCIP_DECL_BENDERSPOSTSOLVE(x) in @ref type_benders.h
     */
    virtual SCIP_DECL_BENDERSPOSTSOLVE(scip_postsolve)
+   {  /*lint --e{715}*/
+      return SCIP_OKAY;
+   }
+
+   /** method called before enforcing the constraints on a Benders' subproblem. Can be used to control whether the
+    * costraint enforcing is run.
+    * 
+    *  @see SCIP_DECL_BENDERSENFORCESOL(x) in @ref type_benders.h
+    */
+   virtual SCIP_DECL_BENDERSENFORCESOL(scip_enforcesol)
    {  /*lint --e{715}*/
       return SCIP_OKAY;
    }

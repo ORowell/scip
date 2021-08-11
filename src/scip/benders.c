@@ -1012,7 +1012,9 @@ SCIP_RETCODE doBendersCreate(
    SCIP_DECL_BENDERSPRESUBSOLVE((*benderspresubsolve)),/**< called prior to the subproblem solving loop */
    SCIP_DECL_BENDERSSOLVESUBCONVEX((*benderssolvesubconvex)),/**< the solving method for convex Benders' decomposition subproblems */
    SCIP_DECL_BENDERSSOLVESUB((*benderssolvesub)),/**< the solving method for the Benders' decomposition subproblems */
+   SCIP_DECL_BENDERSPRECUT((*bendersprecut)),/**< called prior to cuts being added */
    SCIP_DECL_BENDERSPOSTSOLVE((*benderspostsolve)),/**< called after the subproblems are solved. */
+   SCIP_DECL_BENDERSENFORCESOL((*bendersenforcesol)),/**< called before enforcing the constraints on a Benders' subproblem */
    SCIP_DECL_BENDERSFREESUB((*bendersfreesub)),/**< the freeing method for the Benders' decomposition subproblems */
    SCIP_BENDERSDATA*     bendersdata         /**< Benders' decomposition data */
    )
@@ -1055,7 +1057,9 @@ SCIP_RETCODE doBendersCreate(
    (*benders)->benderspresubsolve = benderspresubsolve;
    (*benders)->benderssolvesubconvex = benderssolvesubconvex;
    (*benders)->benderssolvesub = benderssolvesub;
+   (*benders)->bendersprecut = bendersprecut;
    (*benders)->benderspostsolve = benderspostsolve;
+   (*benders)->bendersenforcesol = bendersenforcesol;
    (*benders)->bendersfreesub = bendersfreesub;
    (*benders)->bendersdata = bendersdata;
    SCIP_CALL( SCIPclockCreate(&(*benders)->setuptime, SCIP_CLOCKTYPE_DEFAULT) );
@@ -1210,7 +1214,9 @@ SCIP_RETCODE SCIPbendersCreate(
    SCIP_DECL_BENDERSPRESUBSOLVE((*benderspresubsolve)),/**< called prior to the subproblem solving loop */
    SCIP_DECL_BENDERSSOLVESUBCONVEX((*benderssolvesubconvex)),/**< the solving method for convex Benders' decomposition subproblems */
    SCIP_DECL_BENDERSSOLVESUB((*benderssolvesub)),/**< the solving method for the Benders' decomposition subproblems */
+   SCIP_DECL_BENDERSPRECUT((*bendersprecut)),/**< called prior to cuts being added */
    SCIP_DECL_BENDERSPOSTSOLVE((*benderspostsolve)),/**< called after the subproblems are solved. */
+   SCIP_DECL_BENDERSENFORCESOL((*bendersenforcesol)),/**< called before enforcing the constraints on a Benders' subproblem */
    SCIP_DECL_BENDERSFREESUB((*bendersfreesub)),/**< the freeing method for the Benders' decomposition subproblems */
    SCIP_BENDERSDATA*     bendersdata         /**< Benders' decomposition data */
    )
@@ -1222,7 +1228,8 @@ SCIP_RETCODE SCIPbendersCreate(
    SCIP_CALL_FINALLY( doBendersCreate(benders, set, messagehdlr, blkmem, name, desc, priority, cutlp, cutpseudo,
          cutrelax, shareauxvars, benderscopy, bendersfree, bendersinit, bendersexit, bendersinitpre, bendersexitpre,
          bendersinitsol, bendersexitsol, bendersgetvar, benderscreatesub, benderspresubsolve, benderssolvesubconvex,
-         benderssolvesub, benderspostsolve, bendersfreesub, bendersdata), (void) SCIPbendersFree(benders, set) );
+         benderssolvesub, bendersprecut, benderspostsolve, bendersenforcesol, bendersfreesub, bendersdata),
+         (void) SCIPbendersFree(benders, set) );
 
    return SCIP_OKAY;
 }
@@ -3839,6 +3846,10 @@ SCIP_RETCODE SCIPbendersExec(
          if( stopped )
             break;
 
+         if (benders->bendersprecut != NULL)
+            SCIP_CALL( benders->bendersprecut(set->scip, benders, sol, type, subprobsolved,
+            substatus, nsubproblems, *infeasible, optimal) );
+
          /* Generating cuts for the subproblems. Cuts are only generated when the solution is from primal heuristics,
           * relaxations or the LP
           */
@@ -5898,6 +5909,17 @@ void SCIPbendersSetSolvesub(
    benders->benderssolvesub = benderssolvesub;
 }
 
+/** sets the pre cut callback of Benders' decomposition */
+void SCIPbendersSetPrecut(
+   SCIP_BENDERS*         benders,            /**< Benders' decomposition */
+   SCIP_DECL_BENDERSPRECUT((*bendersprecut))/**< called prior to cuts being added */
+   )
+{
+   assert(benders != NULL);
+
+   benders->bendersprecut = bendersprecut;
+}
+
 /** sets post-solve callback of Benders' decomposition */
 void SCIPbendersSetPostsolve(
    SCIP_BENDERS*         benders,            /**< Benders' decomposition */
@@ -5908,6 +5930,18 @@ void SCIPbendersSetPostsolve(
 
    benders->benderspostsolve = benderspostsolve;
 }
+
+/** called before enforcing the constraints on a Benders' subproblem */
+void SCIPbendersSetEnforcesol(
+   SCIP_BENDERS*         benders,            /**< Benders' decomposition */
+   SCIP_DECL_BENDERSENFORCESOL((*bendersenforcesol))/**< called before enforcing the constraints */
+   )
+{
+   assert(benders != NULL);
+
+   benders->bendersenforcesol = bendersenforcesol;
+}
+
 
 /** sets post-solve callback of Benders' decomposition */
 void SCIPbendersSetSubproblemComp(
